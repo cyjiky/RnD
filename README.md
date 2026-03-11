@@ -1,1 +1,1 @@
-# R&D
+# R&D (Research and Development)
