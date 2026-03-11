@@ -17,7 +17,10 @@ This module is designed to calculate the intermediate spatial coordinates `(X, Y
 The mathematical core is based on the canonical equation of a hyperbola. The pipe profile is modeled taking into account the shift of the coordinate system's center to the middle of the part.
 
 Equation of a hyperbola:
-$$\frac{y^2}{b^2} - \frac{x^2}{a^2} = 1$$
+
+$$
+\frac{y^2}{b^2} - \frac{x^2}{a^2} = 1
+$$
 
 - b - semi-minor axis (determined by the minimum radius at the center of the pipe)
 
@@ -27,14 +30,19 @@ $$\frac{y^2}{b^2} - \frac{x^2}{a^2} = 1$$
 
 To calculate the hyperbola parameter a, we use a formula that expresses a through a point guaranteed to be on the pipe.
 
-$$a = \sqrt{\frac{x_t^2}{\frac{y_t^2}{b^2} - 1}}$$
+$$
+a = \sqrt{\frac{x_t^2}{\frac{y_t^2}{b^2} - 1}}
+$$
 
 - `x_t` - half of the pipe length, representing the X-axis coordinate of the point guaranteed to lie on the pipe.
 
 - `y_t` - maximum radius, representing the Y-axis coordinate of the known point, which corresponds to the `x_t` coordinate.
 
 The code implements an adaptation of this equation with the center shifted. The calculation of the Y coordinate for any point X is performed using the derived formula:
-$$y(x) = b \sqrt{1 + \frac{(x - \frac{L}{2})^2}{a^2}}$$
+
+$$
+y(x) = b \sqrt{1 + \frac{(x - \frac{L}{2})^2}{a^2}}
+$$
 
 - L - pipe length
 
@@ -61,7 +69,10 @@ It takes the step value between $x$ coordinates and creates an evenly spaced lis
 It calculates the $Y$ list for the y coordinates of points on the pipe corresponding to the $X$ list.
 
 It applies the following formula to each $X$ value:
-$$y = b \sqrt{1 + \frac{(x - \frac{L}{2})^2}{a^2}}$$
+
+$$
+y = b \sqrt{1 + \frac{(x - \frac{L}{2})^2}{a^2}}
+$$
 
 - L - pipe length
 - x - an element of the X list
@@ -95,6 +106,7 @@ response = requests.post(url, json=Y_sample)
 ```
 url - the URL address of the endpoint; change this to yours.
 
+--- 
 <div align="center">
 
 **Authors**  
