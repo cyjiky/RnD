@@ -2,6 +2,7 @@ import numpy as np
 from typing import List, Dict, Literal, Tuple
 import requests
 
+from pipe_exceptions import Exceptions
 
 class Pipe:
     """
@@ -28,11 +29,11 @@ class Pipe:
         shortest_dim: float, true_point_X: float, true_point_Y: float
     ) -> Tuple[float, float]:
         """Returns a and b respectively"""
-        b = shortest_dim
+        b = shortest_dim / 2
 
         # TODO: Add constraits for root term, it can't be less than 0
         a = np.sqrt(
-            (true_point_X ** 2) / (((true_point_Y ** 2) / b ** 2) - 1)
+            (true_point_X ** 2) / ((((true_point_Y / 2) ** 2) / b ** 2) - 1)
         )
 
         return a, b
@@ -49,16 +50,26 @@ class Pipe:
         longest_dim: float = 127.537,
         shortest_dim: float = 125,
         pipe_length: float = 750,
-        X_shift: float = 0,
-        Y_shift: float = 0,
+        X_new: float = 0,
+        Y_new: float = 0,
     ) -> None:
+
+        Exceptions.validate_pipe_dimensions(
+            longest_dim=longest_dim,
+            shortest_dim=shortest_dim,
+            pipe_length=pipe_length
+        )
+        Exceptions.validate_X_Y_new(
+            X_new=X_new,
+            Y_new=Y_new
+        )
 
         self._shortest_dim = shortest_dim
         self._longest_dim = longest_dim
         self._length = pipe_length
 
-        self._X_new = X_shift
-        self._Y_new = -Y_shift
+        self._X_new = X_new
+        self._Y_new = -Y_new
 
         self._update_a_b()
 
@@ -68,7 +79,7 @@ class Pipe:
 
     @length.setter
     def length(self, value: float) -> None:
-        # TODO: Constraits for lengt
+        Exceptions.validate_pipe_dimensions(pipe_length=value)
 
         self._length = value
         self._update_a_b()
@@ -79,7 +90,7 @@ class Pipe:
 
     @longest_dim.setter
     def longest_dim(self, value: float) -> None:
-        # TODO: Constraits for longest diameter
+        Exceptions.validate_pipe_dimensions(longest_dim=value, shortest_dim=self._shortest_dim)
 
         self._longest_dim = value
         self._update_a_b()
@@ -90,7 +101,7 @@ class Pipe:
 
     @shortest_dim.setter
     def shortest_dim(self, value: float) -> None:
-        ## TODO: Constraits for shortest diameter
+        Exceptions.validate_pipe_dimensions(shortest_dim=value, longest_dim=self._longest_dim)
 
         self._shortest_dim = value
         self._update_a_b()
@@ -101,8 +112,7 @@ class Pipe:
 
     @X_new.setter
     def X_new(self, value: float) -> None:
-        ## TODO: Constraits for X_new
-
+        Exceptions.validate_X_Y_new(X_new=value)
         self._X_new = value
 
     @property
@@ -111,8 +121,7 @@ class Pipe:
 
     @Y_new.setter
     def Y_new(self, value: float) -> None:
-        ## TODO: Constraits for Y_new
-
+        Exceptions.validate_X_Y_new(Y_new=value)
         self._Y_new = -value
 
     # a and b must be protected from outside changing
@@ -128,44 +137,60 @@ class Pipe:
         self, step: float
     ) -> List[Dict[Literal["X", "Y", "Step"], float]]:
 
-        X = np.linspace(0, self.length, num=int(self.length / step))
+        Exceptions.validate_step(
+            step=step,
+            pipe_length=self._length
+        )
+
+        # self.length+step to include last X coordinates
+        X = np.arange(start=0, stop=self.length+step, step=step)
         Y = self._b * np.sqrt(1 + ((X - self.length / 2) ** 2 / self._a**2))
+        Y *= 2 # To take diameter
 
         res = []
 
         for x, y in zip(X, Y):
+            Exceptions.validate_ans(X=x, Y=y, Step=step)
+
             cords = {}
             cords["X"] = float(x - self.X_new)
             cords["Y"] = float(y - self.Y_new)
-            # cords["Step"] = step
 
             res.append(cords)
 
         return res
 
 
-pipe = Pipe(longest_dim=625.001, shortest_dim=615.025, pipe_length=880)
-
-""" number of steps """
-Y_sample = pipe.calculate_points_Y(step=int(880 / 177))
-print(np.array(Y_sample)[:, np.newaxis])
-
-
-""" step size """
-# Y_sample = pipe.calculate_points_Y(step=0.224)
-# for n in Y_sample:
-#     print(n)
-
-
-url = "http://127.0.0.1:8000/[your endpoint URI]"
-
-try:
-    response = requests.post(url, json=Y_sample)
-    response.raise_for_status()
-    print(f"Answer: {response.json()}")
-except requests.exceptions.RequestException as e:
-    print(f"Oh noooo: {e}")
-
-
 if __name__ == "__main__":
     """Usage example"""
+
+    try:
+        pipe = Pipe(
+            longest_dim=30,
+            shortest_dim=40,
+            pipe_length=100
+        )
+    except ValueError as e:
+        print(f"Catched ValueError: {e}")
+
+    pipe = Pipe(
+        longest_dim=50,
+        shortest_dim=10,
+        pipe_length=10
+    )
+
+    cords = pipe.calculate_points_Y(0.1)
+    print(f"Computed {len(cords)} values")
+    print(cords[:10])
+    print("...")
+    print(cords[len(cords)-10:])
+
+
+# url = "http://127.0.0.1:8000/[your endpoint URI]"
+
+# try:
+#     response = requests.post(url, json=Y_sample)
+#     response.raise_for_status()
+#     print(f"Answer: {response.json()}")
+# except requests.exceptions.RequestException as e:
+#     print(f"Oh noooo: {e}")
