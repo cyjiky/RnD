@@ -29,7 +29,11 @@ class Pipe:
     ) -> Tuple[float, float]:
         """Returns a and b respectively"""
         b = shortest_dim
-        a = np.sqrt((true_point_X**2) / (((true_point_Y**2) / b**2) - 1))
+
+        # TODO: Add constraits for root term, it can't be less than 0
+        a = np.sqrt(
+            (true_point_X ** 2) / (((true_point_Y ** 2) / b ** 2) - 1)
+        )
 
         return a, b
 
