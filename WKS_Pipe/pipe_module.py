@@ -24,20 +24,20 @@ class Pipe:
     """
 
     @staticmethod
-    def _calculate_new_a_b(shortest_dim: float, true_point_X: float, true_point_Y: float) -> Tuple[float, float]:
+    def _calculate_new_a_b(
+        shortest_dim: float, true_point_X: float, true_point_Y: float
+    ) -> Tuple[float, float]:
         """Returns a and b respectively"""
         b = shortest_dim
-        a = np.sqrt(
-            (true_point_X ** 2) / (((true_point_Y ** 2) / b ** 2) - 1)
-        )
+        a = np.sqrt((true_point_X**2) / (((true_point_Y**2) / b**2) - 1))
 
         return a, b
-    
+
     def _update_a_b(self) -> None:
         self._a, self._b = self._calculate_new_a_b(
             shortest_dim=self._shortest_dim,
             true_point_X=self._length / 2,
-            true_point_Y=self._longest_dim
+            true_point_Y=self._longest_dim,
         )
 
     def __init__(
@@ -48,7 +48,7 @@ class Pipe:
         X_shift: float = 0,
         Y_shift: float = 0,
     ) -> None:
-        
+
         self._shortest_dim = shortest_dim
         self._longest_dim = longest_dim
         self._length = pipe_length
@@ -61,7 +61,7 @@ class Pipe:
     @property
     def length(self) -> float:
         return self._length
-    
+
     @length.setter
     def length(self, value: float) -> None:
         # TODO: Constraits for lengt
@@ -69,11 +69,10 @@ class Pipe:
         self._length = value
         self._update_a_b()
 
-
     @property
     def longest_dim(self) -> float:
         return self._longest_dim
-    
+
     @longest_dim.setter
     def longest_dim(self, value: float) -> None:
         # TODO: Constraits for longest diameter
@@ -84,7 +83,7 @@ class Pipe:
     @property
     def shortest_dim(self) -> float:
         return self._shortest_dim
-    
+
     @shortest_dim.setter
     def shortest_dim(self, value: float) -> None:
         ## TODO: Constraits for shortest diameter
@@ -95,7 +94,7 @@ class Pipe:
     @property
     def X_new(self) -> float:
         return self._X_new
-    
+
     @X_new.setter
     def X_new(self, value: float) -> None:
         ## TODO: Constraits for X_new
@@ -105,13 +104,12 @@ class Pipe:
     @property
     def Y_new(self) -> float:
         return self._Y_new
-    
+
     @Y_new.setter
     def Y_new(self, value: float) -> None:
         ## TODO: Constraits for Y_new
 
         self._Y_new = -value
-
 
     # a and b must be protected from outside changing
     @property
@@ -121,7 +119,6 @@ class Pipe:
     @property
     def b(self) -> float:
         return self._b
-    
 
     def calculate_points_Y(
         self, step: float
@@ -160,7 +157,7 @@ url = "http://127.0.0.1:8000/[your endpoint URI]"
 
 try:
     response = requests.post(url, json=Y_sample)
-    print(f"Status: {response.status_code}")
+    response.raise_for_status()
     print(f"Answer: {response.json()}")
 except requests.exceptions.RequestException as e:
     print(f"Oh noooo: {e}")

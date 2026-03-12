@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# WKS_Pipe 
+/WKS_Pipe/notes 
+
 # Distribution / packaging
 .Python
 build/
