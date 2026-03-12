@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List, Dict, Literal
+from typing import List, Dict, Literal, Tuple
 import requests
 
 
@@ -23,6 +23,23 @@ class Pipe:
         Function step
     """
 
+    @staticmethod
+    def _calculate_new_a_b(shortest_dim: float, true_point_X: float, true_point_Y: float) -> Tuple[float, float]:
+        """Returns a and b respectively"""
+        b = shortest_dim
+        a = np.sqrt(
+            (true_point_X ** 2) / (((true_point_Y ** 2) / b ** 2) - 1)
+        )
+
+        return a, b
+    
+    def _update_a_b(self) -> None:
+        self._a, self._b = self._calculate_new_a_b(
+            shortest_dim=self._shortest_dim,
+            true_point_X=self._length / 2,
+            true_point_Y=self._longest_dim
+        )
+
     def __init__(
         self,
         longest_dim: float = 127.537,
@@ -31,18 +48,80 @@ class Pipe:
         X_shift: float = 0,
         Y_shift: float = 0,
     ) -> None:
+        
+        self._shortest_dim = shortest_dim
+        self._longest_dim = longest_dim
+        self._length = pipe_length
 
-        self._b = np.float64(shortest_dim)
+        self._X_new = X_shift
+        self._Y_new = -Y_shift
 
-        self.length = pipe_length
+        self._update_a_b()
 
-        self.X_new = X_shift
-        self.Y_new = -Y_shift
-        self.true_p = (pipe_length / 2, longest_dim)
+    @property
+    def length(self) -> float:
+        return self._length
+    
+    @length.setter
+    def length(self, value: float) -> None:
+        # TODO: Constraits for lengt
 
-        self._a = np.sqrt(
-            (self.true_p[0] ** 2) / (((self.true_p[1] ** 2) / self._b**2) - 1)
-        )
+        self._length = value
+        self._update_a_b()
+
+
+    @property
+    def longest_dim(self) -> float:
+        return self._longest_dim
+    
+    @longest_dim.setter
+    def longest_dim(self, value: float) -> None:
+        # TODO: Constraits for longest diameter
+
+        self._longest_dim = value
+        self._update_a_b()
+
+    @property
+    def shortest_dim(self) -> float:
+        return self._shortest_dim
+    
+    @shortest_dim.setter
+    def shortest_dim(self, value: float) -> None:
+        ## TODO: Constraits for shortest diameter
+
+        self._shortest_dim = value
+        self._update_a_b()
+
+    @property
+    def X_new(self) -> float:
+        return self._X_new
+    
+    @X_new.setter
+    def X_new(self, value: float) -> None:
+        ## TODO: Constraits for X_new
+
+        self._X_new = value
+
+    @property
+    def Y_new(self) -> float:
+        return self._Y_new
+    
+    @Y_new.setter
+    def Y_new(self, value: float) -> None:
+        ## TODO: Constraits for Y_new
+
+        self._Y_new = -value
+
+
+    # a and b must be protected from outside changing
+    @property
+    def a(self) -> float:
+        return self._a
+
+    @property
+    def b(self) -> float:
+        return self._b
+    
 
     def calculate_points_Y(
         self, step: float
@@ -85,3 +164,7 @@ try:
     print(f"Answer: {response.json()}")
 except requests.exceptions.RequestException as e:
     print(f"Oh noooo: {e}")
+
+
+if __name__ == "__main__":
+    """Usage example"""
