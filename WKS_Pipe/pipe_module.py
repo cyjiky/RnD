@@ -27,6 +27,8 @@ class Pipe:
     def _calculate_new_a_b(shortest_dim: float, true_point_X: float, true_point_Y: float) -> Tuple[float, float]:
         """Returns a and b respectively"""
         b = shortest_dim
+
+        # TODO: Add constraits for root term, it can't be less than 0
         a = np.sqrt(
             (true_point_X ** 2) / (((true_point_Y ** 2) / b ** 2) - 1)
         )
