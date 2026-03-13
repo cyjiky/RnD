@@ -1,8 +1,8 @@
 import numpy as np
 from typing import List, Dict, Literal, Tuple
-import requests
 
 from pipe_exceptions import Exceptions
+
 
 class Pipe:
     """
@@ -32,9 +32,7 @@ class Pipe:
         b = shortest_dim / 2
 
         # TODO: Add constraits for root term, it can't be less than 0
-        a = np.sqrt(
-            (true_point_X ** 2) / ((((true_point_Y / 2) ** 2) / b ** 2) - 1)
-        )
+        a = np.sqrt((true_point_X**2) / ((((true_point_Y / 2) ** 2) / b**2) - 1))
 
         return a, b
 
@@ -55,14 +53,9 @@ class Pipe:
     ) -> None:
 
         Exceptions.validate_pipe_dimensions(
-            longest_dim=longest_dim,
-            shortest_dim=shortest_dim,
-            pipe_length=pipe_length
+            longest_dim=longest_dim, shortest_dim=shortest_dim, pipe_length=pipe_length
         )
-        Exceptions.validate_X_Y_new(
-            X_new=X_new,
-            Y_new=Y_new
-        )
+        Exceptions.validate_X_Y_new(X_new=X_new, Y_new=Y_new)
 
         self._shortest_dim = shortest_dim
         self._longest_dim = longest_dim
@@ -90,7 +83,9 @@ class Pipe:
 
     @longest_dim.setter
     def longest_dim(self, value: float) -> None:
-        Exceptions.validate_pipe_dimensions(longest_dim=value, shortest_dim=self._shortest_dim)
+        Exceptions.validate_pipe_dimensions(
+            longest_dim=value, shortest_dim=self._shortest_dim
+        )
 
         self._longest_dim = value
         self._update_a_b()
@@ -101,7 +96,9 @@ class Pipe:
 
     @shortest_dim.setter
     def shortest_dim(self, value: float) -> None:
-        Exceptions.validate_pipe_dimensions(shortest_dim=value, longest_dim=self._longest_dim)
+        Exceptions.validate_pipe_dimensions(
+            shortest_dim=value, longest_dim=self._longest_dim
+        )
 
         self._shortest_dim = value
         self._update_a_b()
@@ -137,19 +134,19 @@ class Pipe:
         self, step: float
     ) -> List[Dict[Literal["X", "Y", "Step"], float]]:
 
-        Exceptions.validate_step(
-            step=step,
-            pipe_length=self._length
-        )
+        Exceptions.validate_step(step=step, pipe_length=self._length)
 
         # self.length+step to include last X coordinates
-        X = np.arange(start=0, stop=self.length+step, step=step)
-        Y = self._b * np.sqrt(1 + ((X - self.length / 2) ** 2 / self._a**2))
-        Y *= 2 # To take diameter
+        X = np.arange(start=0, stop=self._length + step, step=step)
+        Y = self._b * np.sqrt(1 + ((X - self._length / 2) ** 2 / self._a**2))
+        Y *= 2  # To take diameter
 
         res = []
 
         for x, y in zip(X, Y):
+            if x > self._length:
+                continue
+
             Exceptions.validate_ans(X=x, Y=y, Step=step)
 
             cords = {}
@@ -165,25 +162,17 @@ if __name__ == "__main__":
     """Usage example"""
 
     try:
-        pipe = Pipe(
-            longest_dim=30,
-            shortest_dim=40,
-            pipe_length=100
-        )
+        pipe = Pipe(longest_dim=30, shortest_dim=40, pipe_length=100)
     except ValueError as e:
         print(f"Catched ValueError: {e}")
 
-    pipe = Pipe(
-        longest_dim=50,
-        shortest_dim=10,
-        pipe_length=10
-    )
+    pipe = Pipe(longest_dim=50, shortest_dim=10, pipe_length=10)
 
     cords = pipe.calculate_points_Y(0.1)
     print(f"Computed {len(cords)} values")
     print(cords[:10])
     print("...")
-    print(cords[len(cords)-10:])
+    print(cords[len(cords) - 10 :])
 
 
 # url = "http://127.0.0.1:8000/[your endpoint URI]"

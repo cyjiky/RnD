@@ -1,5 +1,7 @@
 # Hyperbolic Pipe Geometry Interpolator
 
+> Requires python 3.12+
+
 ## Description
 
 This module is designed to calculate the intermediate spatial coordinates `(X, Y)` of curved pipe structures. This solution is applicable when only the boundary dimensions of the part are known (maximum and minimum diameters, as well as the total length). The pipe profile is described by a hyperbolic function.

@@ -1,0 +1,10 @@
+{
+    "pipe_config": {
+        "longest_diameter": 10,
+        "shortest_diameter": 3,
+        "pipe_length": 10
+    },
+    "compute_config": {
+        "step_value": 0.3
+    }
+}
