@@ -108,7 +108,7 @@ if __name__ == "__main__":
     except FileNotFoundError:
         raise ConfigException("'conf/pipe_config.json' is not found, create it first")
 
-    if not config or not isinstance(config, dict):
+    if config is None or not isinstance(config, dict):
         raise ConfigException("Invalid of malformed json config provided")
 
     pipe_config = config.get("pipe_config", None)
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
     if not all([pipe_config, compute_config, export_config]):
         raise ConfigException(
-            f"'{"pipe_config" if not pipe_config else "compute_config" if compute_config else "export_config"}' key is missing in conf.json"
+            f"'{"pipe_config" if not pipe_config else "compute_config" if export_config else "export_config"}' key is missing in conf.json"
         )
 
     validate_pipe_config(pipe_config)
