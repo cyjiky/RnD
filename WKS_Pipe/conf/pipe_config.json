@@ -1,10 +1,10 @@
 {
     "pipe_config": {
-        "longest_diameter": 10,
-        "shortest_diameter": 3,
-        "pipe_length": 10
+        "longest_diameter": 625001,
+        "shortest_diameter": 615025,
+        "pipe_length": 880
     },
     "compute_config": {
-        "step_value": 0.3
+        "step_value": 1
     }
 }
