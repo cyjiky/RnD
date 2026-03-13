@@ -8,6 +8,7 @@ __pycache__/
 
 # WKS_Pipe 
 /WKS_Pipe/notes 
+/WKS_Pipe/sheets_export/creds 
 
 # Distribution / packaging
 .Python

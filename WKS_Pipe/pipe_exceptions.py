@@ -51,7 +51,9 @@ class Exceptions:
         if step <= 0:
             raise ValueError("The step must be greater than zero")
         if step > pipe_length:
-            raise ValueError("Шаг не может быть больше длины самой трубы")
+            raise ValueError(
+                "The step cannot be greater than the length of the pipe itself"
+            )
 
     def validate_X_Y_new(
         X_new: float | None = None, Y_new: float | None = None

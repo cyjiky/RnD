@@ -1,7 +1,7 @@
 {
     "pipe_config": {
-        "longest_diameter": 625001,
-        "shortest_diameter": 615025,
+        "longest_diameter": 625.001,
+        "shortest_diameter": 615.025,
         "pipe_length": 880
     },
     "compute_config": {
