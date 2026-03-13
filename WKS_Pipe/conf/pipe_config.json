@@ -6,5 +6,9 @@
     },
     "compute_config": {
         "step_value": 1
+    },
+    "export_config": {
+        "export_json_local": false,
+        "export_sheets_cloud": true
     }
 }

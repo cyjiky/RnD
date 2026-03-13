@@ -174,12 +174,3 @@ if __name__ == "__main__":
     print("...")
     print(cords[len(cords) - 10 :])
 
-
-# url = "http://127.0.0.1:8000/[your endpoint URI]"
-
-# try:
-#     response = requests.post(url, json=Y_sample)
-#     response.raise_for_status()
-#     print(f"Answer: {response.json()}")
-# except requests.exceptions.RequestException as e:
-#     print(f"Oh noooo: {e}")

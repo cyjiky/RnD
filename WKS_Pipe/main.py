@@ -3,7 +3,7 @@ from pipe_exceptions import ConfigException
 import json
 from typing import Dict, Any
 import os
-
+import requests
 
 class MissingValue:
     """Custom object that used in missing JSON key cases"""
@@ -66,6 +66,36 @@ def validate_compute_config(compute_config: Dict) -> None:
             f"'step_value' key in 'compute_config' has invalid value type, only int and float allowed (conf.json file)"
         )
 
+def validate_export_config(export_config: Dict) -> None:
+    """
+    raise: ConfigException (inherits from Exception) on validation failure
+    """
+
+    export_json_locally = export_config.get("export_json_local", MissingValue)
+    export_sheets_cloud = export_config.get("export_sheets_cloud", MissingValue)
+
+    if export_json_locally is MissingValue:
+        raise ConfigException(
+            "'export_json_locally' is missing in 'export_config' (conf.json file)"
+        )
+    elif export_sheets_cloud is MissingValue:
+        raise ConfigException(
+            "'export_sheets_cloud' is missing in 'export_config' (conf.json file)"
+        )
+    
+    if not isinstance(export_json_locally, bool):
+        raise ConfigException(
+            "'export_json_locally' has invalid value type, only boolean allowed (conf.json file)"
+        )
+    elif not isinstance(export_sheets_cloud, bool):
+        raise ConfigException(
+            "'export_sheets_cloud' has invalid value type, only boolean allowed (conf.json file)"
+        )
+
+    if export_json_locally is False and export_sheets_cloud is False:
+        raise ConfigException(
+            "Not a single export option selected! Set to 'true' at least one in 'export_config' (conf.json file)"
+        )
 
 if __name__ == "__main__":
     config_path = os.path.join("conf", "pipe_config.json")
@@ -83,14 +113,16 @@ if __name__ == "__main__":
 
     pipe_config = config.get("pipe_config", None)
     compute_config = config.get("compute_config", None)
+    export_config = config.get("export_config", None)
 
-    if pipe_config is None or compute_config is None:
+    if not all([pipe_config, compute_config, export_config]):
         raise ConfigException(
-            f"'{"pipe_config" if not pipe_config else "compute_config"}' key is missing in conf.json"
+            f"'{"pipe_config" if not pipe_config else "compute_config" if compute_config else "export_config"}' key is missing in conf.json"
         )
 
     validate_pipe_config(pipe_config)
     validate_compute_config(compute_config)
+    validate_export_config(export_config)
 
     pipe = Pipe(
         longest_dim=pipe_config["longest_diameter"],
@@ -99,10 +131,32 @@ if __name__ == "__main__":
     )
 
     computations = pipe.calculate_points_Y(step=compute_config["step_value"])
-    result_path = os.path.join("results", "cords_results.json")
 
-    if not os.path.isdir("results"):
-        os.mkdir("results")
+    if export_config["export_json_local"] is True:
+        result_path = os.path.join("results", "cords_results.json")
 
-    with open(result_path, "w") as f:
-        json.dump(computations, f, indent=4)
+        if not os.path.isdir("results"):
+            os.mkdir("results")
+
+        with open(result_path, "w") as f:
+            json.dump(computations, f, indent=4)
+
+    if export_config["export_sheets_cloud"] is True:
+        from sheets_export.dtos import Coordinates
+
+        url = "http://127.0.0.1:8000/coordinates"
+
+        mapped_serializable_dto = [
+            Coordinates(
+                X=cord["X"],
+                Y=cord["Y"],
+                Step=cord.get("Step", None) # Could be None
+            ).model_dump() for cord in computations
+        ]
+
+        try:
+            response = requests.post(url, json=mapped_serializable_dto)
+            response.raise_for_status()
+            print(f"Response: {response.json()}")
+        except requests.exceptions.RequestException as e:
+            print(f"Cloud sheets export failed: {e}")

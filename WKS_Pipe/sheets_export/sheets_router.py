@@ -5,7 +5,7 @@ from googleapiclient.errors import HttpError
 from typing import List
 
 from sheets_service import SheetService
-from dtos import Coordinate
+from dtos import Coordinates
 
 load_dotenv()
 
@@ -21,7 +21,7 @@ def HelloWorld():
 
 
 @sheets_router.post("/coordinates")
-def coordinates(cords_results: List[Coordinate]):
+def coordinates(cords_results: List[Coordinates]):
     if not sheet_id:
         raise HTTPException(status_code=500, detail="Sheets ID not configured in .env")
     try:
