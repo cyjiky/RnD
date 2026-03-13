@@ -21,13 +21,14 @@ class SheetService:
         creds_service = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scopes).authorize(httplib2.Http())
         return build('sheets', 'v4', http=creds_service)
     
-    def values(self):
-        return self.sheets.values()
     
     def __init__(self):
         self.service = self.get_service_sheets()
 
         if not self.service:
             raise Exception("Failed to initialize Google Sheets service")
-        self.sheets = self.service.spreadsheets()
+        self.spreadsheets = self.service.spreadsheets()
 
+
+    def values(self):
+        return self.spreadsheets.values()

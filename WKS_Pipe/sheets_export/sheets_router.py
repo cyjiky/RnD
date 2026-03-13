@@ -45,7 +45,7 @@ def coordinates(cords_results: List[Coordinates]):
         }
 
         resp = (
-            main_service.spreadsheets()
+            main_service.spreadsheets
             .values()
             .batchUpdate(
                 spreadsheetId=sheet_id,
@@ -54,6 +54,7 @@ def coordinates(cords_results: List[Coordinates]):
             .execute()
         )
 
-        return {"status": "succeess", "responce": resp}
+        return {"status": "succeess", "responce": "Succesfully uploaded computation to google spreadsheet"}
     except Exception as e:
+        raise e from e
         return {"status": "error", "message": str(e)}
